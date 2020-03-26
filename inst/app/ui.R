@@ -41,7 +41,7 @@ shinyUI(fluidPage(bootstrap(),
         mainPanel(
             tabsetPanel(
                 tabPanel("Pick A Gene", 
-                         selectInput('goi', label = '', choices = readLines('gns.txt'),
+                         selectInput('goi', label = '', choices = data('gns'),
                                      selected = 'BRCA1'),
                          actionButton('goi_go', label = 'GO'),
                          plotlyOutput('goi_plot'),
