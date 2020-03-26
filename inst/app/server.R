@@ -8,9 +8,6 @@
 #
 
 library(shiny)
-
-#library(sass)
-#library(future)
 #remotes::install_github("rstudio/bootstraplib")
 library(vcfR)
 library(plotly)
@@ -20,7 +17,6 @@ library(dplyr)
 library(ggplot2)
 library(cowplot)
 library(data.table)
-source('sarah_seq_functions.R')
 
 # Define server 
 options(shiny.maxRequestSize=500*1024^2)
