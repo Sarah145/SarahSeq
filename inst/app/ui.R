@@ -17,7 +17,7 @@ bs_theme_accent_colors(primary = "#4b36c7")
 
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(bootstrap(),
-    includeCSS("custom.css"), # link to css
+    includeCSS("www/custom.css"), # link to css
 
     
     # page header                  
