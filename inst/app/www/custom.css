@@ -1,0 +1,26 @@
+@import url('//fonts.googleapis.com/css?family=Lobster|Cabin:400,700');
+.header-panel {
+  position: relative;
+  overflow: hidden;
+  }
+.header-panel h1 {
+  position: relative;
+  padding: 20px;
+  font-family: 'Lobster', cursive;
+  color: #4b36c7;
+	font-size: 45px;
+	}
+.header-panel img {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  opacity: 0.2;
+  }
+
+.js-irs-0 .irs-single, .js-irs-0 .irs-bar-edge, .js-irs-0 .irs-bar {
+                                                    background: #4b36c7;
+                                                    border-top: 1px solid #4b36c7 ;
+                                                    border-bottom: 1px solid #4b36c7 ;}
+
+.irs-from, .irs-to, .irs-single { background: #4b36c7 }'

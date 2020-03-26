@@ -25,8 +25,6 @@ goi_plot <- function(plot_df, gene_pos, goi){
           axis.ticks.y = element_blank()), tooltip = 'text')}
 
 genomes_1k_pca <- function(vcf){
-  #genomes_1k_df <- read.csv('~/Documents/Sarah-Seq/new_Sarah_Seq/www/ancestry_snps.csv', sep  = '\t', colClasses = c("pop" = "character", "superpop" = "character"))
-  #ref_allele <- read.csv('~/Documents/Sarah-Seq/new_Sarah_Seq/www/ancestry_snps_ra.csv', sep  = '\t', colClasses = c("ref" = "character"))
   data('genomes_1k_df')
   data('ref_allele')
   ancestry_snps <- colnames(genomes_1k_df)[1:53]
@@ -52,11 +50,9 @@ genomes_1k_pca <- function(vcf){
 }
 
 get_ukbb_overlap <- function(vcf){
-  ukb <- fread('ukbb_variants_small.tsv.gz')
-  ukb$varid <- as.character(ukb$varid)
+  data('ukb')
   my_vars <- paste0(str_sub(vcf@fix[,'CHROM'], 4, -1), ':', vcf@fix[,'POS'], '_', vcf@fix[,'REF'], '_', vcf@fix[,'ALT'])
   overlap <- subset(ukb, ukb$varid %in% my_vars)
-  overlap$percent_people <- (overlap$n_non_ref/overlap$n_called) * 100
   return(overlap)
 }
 
@@ -71,4 +67,14 @@ print_rare_vars <- function(ukbb_overlap_df, p_threshold, pal = pal1){
     scale_x_continuous(expand=c(0,0)) + 
     scale_y_continuous(expand = c(0,0)) + 
     theme_nothing())
+}
+
+SarahSeq <- function(){
+  appDir <- system.file("app", package = "SarahSeq")
+  shiny::runApp(appDir, display.mode = "normal")
+}
+
+readVCF <- function(filepath){
+  vcf <- vcfR::read.vcfR(filepath)
+  return(vcf)
 }
