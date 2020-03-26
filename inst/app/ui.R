@@ -42,7 +42,7 @@ shinyUI(fluidPage(bootstrap(),
         mainPanel(
             tabsetPanel(
                 tabPanel("Pick A Gene", 
-                         selectInput('goi', label = '', choices = c(1,2,3),
+                         selectInput('goi', label = '', choices = readLines(system.file('gns.txt', package = 'SarahSeq')),
                                      selected = 'BRCA1'),
                          actionButton('goi_go', label = 'GO'),
                          plotlyOutput('goi_plot'),
