@@ -14,8 +14,7 @@ library(plotly)
 
 bs_theme_new()
 bs_theme_accent_colors(primary = "#4b36c7")
-genes <- data('gns')
-genes <- as.character(genes)
+
 
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(bootstrap(),
@@ -43,7 +42,7 @@ shinyUI(fluidPage(bootstrap(),
         mainPanel(
             tabsetPanel(
                 tabPanel("Pick A Gene", 
-                         selectInput('goi', label = '', choices = genes,
+                         selectInput('goi', label = '', choices = load(system.file('gns.rda', package = 'SarahSeq')),
                                      selected = 'BRCA1'),
                          actionButton('goi_go', label = 'GO'),
                          plotlyOutput('goi_plot'),
