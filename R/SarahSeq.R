@@ -28,9 +28,12 @@ genomes_1k_pca <- function(vcf){
   data('genomes_1k_df')
   data('ref_allele')
   ancestry_snps <- rownames(ref_allele)
-  my_snps_gt <- extract.gt(subset(vcf, paste0(str_extract(vcf@fix[,'CHROM'], '[0-9]+'), '_', vcf@fix[,'POS']) %in% ref_allele$var_id)
-, return.alleles = T)
-  rownames(my_snps_gt) <- str_extract(rownames(my_snps_gt), '[^a-z]+')
+  my_snps <- subset(vcf, paste0(str_extract(vcf@fix[,'CHROM'], '[0-9]+'), '_', vcf@fix[,'POS']) %in% as.character(row.names(ref_allele)))
+  my_snps_gt <- extract.gt(my_snps, return.alleles = T)
+  if(startsWith(as.character(rownames(my_snps_gt)[1]), 'rs')){
+    rownames(my_snps_gt) <- sapply(rownames(my_snps_gt), FUN = function(x) subset(ref_allele, ref_allele$refsnp_id == x)$varid)
+  } else{
+    rownames(my_snps_gt) <- str_extract(rownames(my_snps_gt), '[^a-z]+')}
   my_gt <- sapply(as.character(ref_allele$varid), function(x) ifelse(x %in% rownames(my_snps_gt), str_count(my_snps_gt[x,1], ref_allele[x, 'ref']) , 2))
   names(my_gt) <- ref_allele[names(my_gt), 'refsnp_id']
   my_gt <- my_gt[colnames(genomes_1k_df[1:53])]
