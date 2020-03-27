@@ -23,4 +23,30 @@
                                                     border-top: 1px solid #4b36c7 ;
                                                     border-bottom: 1px solid #4b36c7 ;}
 
-.irs-from, .irs-to, .irs-single { background: #4b36c7 }'
+.irs-from, .irs-to, .irs-single { background: #4b36c7 }
+
+.progress-bar {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    background-color: #4B36C7;
+    transition: width 0.6s ease;
+}
+
+.btn-default {
+    color: #333;
+    background-color: #fff;
+    border-color: #4b36c7;
+}
+
+.nav-tabs>li>a {
+    margin-right: 2px;
+    line-height: 1.42857143;
+    border: 1px solid transparent;
+    border-radius: 4px 4px 0 0;
+    color: #4b36c7;
+}

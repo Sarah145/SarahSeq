@@ -73,8 +73,8 @@ shinyServer(function(input, output) {
       goi_plot(goi_df(), gene_pos(), goi())
     })
     
-    # output gene of interest df
-    output$goi_table <- renderDataTable({
+    
+    dt <- reactive({
       if(is.na(unique(goi_df()$id)[1])){
         dt <- goi_df()}
       else{
@@ -91,7 +91,24 @@ shinyServer(function(input, output) {
         predicted_consequence <- sift[goi_df()$id, 'sift_prediction']
         dt <- cbind(goi_df()[,c(1:3)], id, predicted_consequence)}
       dt
+    })
+    
+    # output gene of interest df
+    output$goi_table <- renderDataTable({
+      dt()
     }, escape = c('position', 'variant', 'num_alleles'))
+    
+    
+    # Downloadable csv of rare vars
+    output$download_goi <- downloadHandler(
+      filename = paste0(input$goi, '_variants.tsv'),
+      content = function(file) {
+        chr <- rep(gene_pos()$chromosome_name, nrow(dt()))
+        goi_out <- cbind(chr, dt())
+        goi_out$id <- str_extract(goi_out$id, 'rs[0-9]+')
+        write.table(goi_out, file, row.names = FALSE, sep = '\t', quote = F)
+      }
+    )
     
     # output 1k genomes pca plot
     output$genomes_1k_pca <-  renderPlotly({
@@ -116,6 +133,14 @@ shinyServer(function(input, output) {
       output_df <- data.frame(rare_var_df(), id = paste0('<a href="https://www.ncbi.nlm.nih.gov/snp/', rare_var_df()$rsid, '">', rare_var_df()$rsid, '</a>'))
       output_df[,c('varid', 'id', 'percent_people', 'consequence', 'consequence_category')]
     }, options = list(pageLength = 10), escape = c(1,3:5))
+    
+    # Downloadable csv of rare vars
+    output$download_rare_var <- downloadHandler(
+      filename = 'rare_vars.tsv',
+      content = function(file) {
+        write.table(rare_var_df(), file, row.names = FALSE, sep = '\t', quote = F)
+      }
+    )
     
     # print title for rare var plot
     output$plot_title <- renderUI(h5(paste0('This is what sets you apart from ~', prettyNum(round(361194-(input$p_threshold/100*361194)),big.mark = ','), ' people!')))

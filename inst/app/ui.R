@@ -8,16 +8,13 @@
 #
 
 library(shiny)
-library(bootstraplib)
 library(shinycssloaders)
 library(plotly)
 
-bs_theme_new()
-bs_theme_accent_colors(primary = "#4b36c7")
 
 
 # Define UI for application that draws a histogram
-shinyUI(fluidPage(bootstrap(),
+shinyUI(fluidPage(
     includeCSS("www/custom.css"), # link to css
 
     
@@ -47,7 +44,10 @@ shinyUI(fluidPage(bootstrap(),
                          actionButton('goi_go', label = 'GO'),
                          plotlyOutput('goi_plot'),
                          tags$hr(),
-                         dataTableOutput('goi_table')),
+                         conditionalPanel(
+                             condition = "input.goi_go > 0",
+                             downloadButton("download_goi", "Download"),
+                             dataTableOutput('goi_table'))),
                 tabPanel("Rare Variants",
                          tags$div(style="margin-top:40px; margin-bottom:30px;",
                                   h5('Compare your genome with the UK BioBank to find rare variants.'),
@@ -58,7 +58,10 @@ shinyUI(fluidPage(bootstrap(),
                                               min = 0.01, max = 10, value = 1, width = '100%')
                          ),
                          tags$hr(),
-                         withSpinner(dataTableOutput('rare_var_df'), color = "#4b36c7"),
+                         conditionalPanel(
+                             condition = "input.rare_var_go > 0",
+                             downloadButton("download_rare_var", "Download"),
+                             withSpinner(dataTableOutput('rare_var_df'), color = "#4b36c7")),
                          tags$hr(),
                          conditionalPanel(
                              condition = "input.rare_var_go > 0",
