@@ -27,9 +27,13 @@ goi_plot <- function(plot_df, gene_pos, goi){
 genomes_1k_pca <- function(vcf){
   data('genomes_1k_df')
   data('ref_allele')
-  ancestry_snps <- colnames(genomes_1k_df)[1:53]
-  my_snps_gt <- extract.gt(subset(vcf, vcf@fix[,'ID'] %in% ancestry_snps), return.alleles = T)
-  my_gt <- sapply(ancestry_snps, function(x) ifelse(x %in% rownames(my_snps_gt), str_count(my_snps_gt[x,1], ref_allele[x, 'ref']) , 2))
+  ancestry_snps <- rownames(ref_allele)
+  my_snps_gt <- extract.gt(subset(vcf, paste0(str_extract(vcf@fix[,'CHROM'], '[0-9]+'), '_', vcf@fix[,'POS']) %in% ref_allele$var_id)
+, return.alleles = T)
+  rownames(my_snps_gt) <- str_extract(rownames(my_snps_gt), '[^a-z]+')
+  my_gt <- sapply(as.character(ref_allele$varid), function(x) ifelse(x %in% rownames(my_snps_gt), str_count(my_snps_gt[x,1], ref_allele[x, 'ref']) , 2))
+  names(my_gt) <- ref_allele[names(my_gt), 'refsnp_id']
+  my_gt <- my_gt[colnames(snp_df[1:53])]
   snp_df <- rbind(genomes_1k_df, c(my_gt, 'Me', 'Me'))
   pca_df <- mutate_all(snp_df[,1:53], function(x) as.numeric(as.character(x)))
   pca <- prcomp(pca_df)
@@ -51,7 +55,7 @@ genomes_1k_pca <- function(vcf){
 
 get_ukbb_overlap <- function(vcf){
   data('ukb')
-  my_vars <- paste0(str_sub(vcf@fix[,'CHROM'], 4, -1), ':', vcf@fix[,'POS'], '_', vcf@fix[,'REF'], '_', vcf@fix[,'ALT'])
+  my_vars <- paste0(str_extract(vcf@fix[,'CHROM'], '[0-9]+'), ':', vcf@fix[,'POS'], '_', vcf@fix[,'REF'], '_', vcf@fix[,'ALT'])
   overlap <- subset(ukb, ukb$varid %in% my_vars)
   return(overlap)
 }

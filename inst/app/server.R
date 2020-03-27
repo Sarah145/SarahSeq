@@ -45,7 +45,7 @@ shinyServer(function(input, output) {
     # get location of gene of interest
     gene_pos <- reactive({
       req(input$goi)
-      getBM(attributes=c('chromosome_name', 'start_position', 'end_position'), 
+      df <- getBM(attributes=c('chromosome_name', 'start_position', 'end_position'), 
                                                filters = c('hgnc_symbol'),
                                                values= goi(),
                                                mart=ensembl)
@@ -54,9 +54,9 @@ shinyServer(function(input, output) {
     # get variants in that region 
     my_vars <- reactive({
       req(gene_pos(), vcfInput())
-      subset(vcfInput(), vcfInput()@fix[,'CHROM'] == paste0('chr', gene_pos()$chromosome_name) & 
-                        as.numeric(vcfInput()@fix[,'POS']) >= gene_pos()$start_position &
-                        as.numeric(vcfInput()@fix[,'POS']) <= gene_pos()$end_position)
+      subset(vcfInput(), as.numeric(str_extract(vcfInput()@fix[,'CHROM'], '[0-9]+')) == gene_pos()$chromosome_name & 
+                         as.numeric(vcfInput()@fix[,'POS']) >= gene_pos()$start_position &
+                         as.numeric(vcfInput()@fix[,'POS']) <= gene_pos()$end_position)
       })
     
     # create gene of interest df for plotting
@@ -74,21 +74,24 @@ shinyServer(function(input, output) {
     })
     
     # output gene of interest df
-    output$goi_df <- renderDataTable({
-      id <- paste0('<a href="https://www.ncbi.nlm.nih.gov/snp/', goi_df()$id, '">', goi_df()$id, '</a>')
-      sift <- getBM(attributes = c('refsnp_id', 'sift_prediction', 'consequence_allele_string'), 
-                    filters = 'snp_filter', 
-                    values = goi_df()$id, 
-                    mart = snp_mart) %>% 
-        filter(sift_prediction != "") %>%
-        mutate(id = refsnp_id) %>% 
-        inner_join(goi_df(), by = 'id') %>%
-        filter(str_extract(consequence_allele_string, '([^/]+$)') == variant) %>%
-        `rownames<-`(.[,1])
-      predicted_consequence <- sift[goi_df()$id, 'sift_prediction']
-      dt <- cbind(goi_df()[,c(1:3)], id, predicted_consequence)
+    output$goi_table <- renderDataTable({
+      if(is.na(unique(goi_df()$id)[1])){
+        dt <- goi_df()}
+      else{
+        id <- paste0('<a href="https://www.ncbi.nlm.nih.gov/snp/', goi_df()$id, '">', goi_df()$id, '</a>')
+        sift <- getBM(attributes = c('refsnp_id', 'sift_prediction', 'consequence_allele_string'), 
+                      filters = 'snp_filter', 
+                      values = goi_df()$id, 
+                      mart = snp_mart) %>% 
+          filter(sift_prediction != "") %>%
+          mutate(id = refsnp_id) %>% 
+          inner_join(goi_df(), by = 'id') %>%
+          filter(str_extract(consequence_allele_string, '([^/]+$)') == variant) %>%
+          `rownames<-`(.[,1])
+        predicted_consequence <- sift[goi_df()$id, 'sift_prediction']
+        dt <- cbind(goi_df()[,c(1:3)], id, predicted_consequence)}
       dt
-    }, escape = c(1:3, 5))
+    }, escape = c('position', 'variant', 'num_alleles'))
     
     # output 1k genomes pca plot
     output$genomes_1k_pca <-  renderPlotly({
