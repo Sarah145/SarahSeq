@@ -3,7 +3,7 @@ Title: Specific functions for analysing personal genomics data
 Version: 0.0.0.9000
 Authors@R: person("Sarah", "Ennis", email = "s.ennis6@nuigalway.ie", role = "cre")
 Description: A collection of functions for SarahSeq app
-Imports: vcfR, dplyr, ggplot2, plotly, cowplot, shiny, bootstraplib, shinycssloaders, biomaRt, stringr, data.table
+Imports: vcfR, dplyr, ggplot2, plotly, cowplot, shiny, shinycssloaders, biomaRt, stringr, data.table
 License: GPL-3
 Encoding: UTF-8
 LazyData: true

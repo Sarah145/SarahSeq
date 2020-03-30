@@ -8,7 +8,6 @@
 #
 
 library(shiny)
-#remotes::install_github("rstudio/bootstraplib")
 library(vcfR)
 library(plotly)
 library(biomaRt)
