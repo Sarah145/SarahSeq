@@ -12,7 +12,6 @@ library(shinycssloaders)
 library(plotly)
 
 
-
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(
     includeCSS("www/custom.css"), # link to css

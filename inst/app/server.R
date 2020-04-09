@@ -16,6 +16,7 @@ library(dplyr)
 library(ggplot2)
 library(cowplot)
 library(data.table)
+library(SarahSeq)
 
 # Define server 
 options(shiny.maxRequestSize=500*1024^2)

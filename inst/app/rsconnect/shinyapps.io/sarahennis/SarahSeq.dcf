@@ -1,0 +1,12 @@
+name: SarahSeq
+title: SarahSeq
+username:
+account: sarahennis
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 2089051
+bundleId: 2993001
+url: https://sarahennis.shinyapps.io/SarahSeq/
+when: 1586451949.55238
+asMultiple: FALSE
+asStatic: FALSE
