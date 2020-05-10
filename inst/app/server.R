@@ -18,6 +18,7 @@ library(cowplot)
 library(data.table)
 library(SarahSeq)
 library(HilbertCurve)
+library(GenomicRanges)
 
 # Define server 
 options(shiny.maxRequestSize=500*1024^2)
