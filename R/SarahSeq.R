@@ -3,6 +3,9 @@ pal2 <- c("#440154FF", "#31688EFF", "#35B779FF", "#FDE725FF")
 pal3 <- c("#0D0887FF", "#9C179EFF", "#ED7953FF", "#F0F921FF")
 pal4 <- c('#FFFF00', '#FF0000', '#00FF00', '#0000FF', '#000000')
 pals <- c(list(pal1), list(pal2), list(pal3), list(pal4))
+hil_pal1 <- colorRampPalette(c("#0c0026", "#56106EFF", "#BB3754FF", "#BB3754FF", "#F98C0AFF", "#F98C0AFF", "#F98C0AFF", "#FCFFA4FF", "#FCFFA4FF", "#FCFFA4FF", "#FCFFA4FF"))
+hil_pal2 <- colorRampPalette(c("#440154FF", "#3B528BFF",  "#21908CFF", "#21908CFF", "#5DC863FF", "#5DC863FF", "#5DC863FF", "#FDE725FF", "#FDE725FF", "#FDE725FF", "#FDE725FF", "#FDE725FF"))
+hil_pals <- c(list(hil_pal1), list(hil_pal2))
 
 goi_plot <- function(plot_df, gene_pos, goi){
   ggplotly(
@@ -72,6 +75,39 @@ print_rare_vars <- function(ukbb_overlap_df, p_threshold, pal = pal1){
     scale_y_continuous(expand = c(0,0)) + 
     theme_nothing())
 }
+
+hilbert_plot <- function(vcf, hil_pal, legend = NULL){
+  hg19_seqlengths <- c(249250621, 243199373, 198022430, 191154276, 180915260, 171115067, 159138663, 146364022, 141213431, 135534747, 135006516, 133851895, 115169878, 107349540, 102531392, 90354753, 81195210, 78077248, 59128983, 63025520, 48129895, 51304566)
+  names(hg19_seqlengths) <- paste0('chr', seq(1:22))
+  sub_vcf <- subset(vcf, str_extract(vcf@fix[,'CHROM'], '[0-9]+') %in% seq(1:22))
+  gr <- GRanges(seqnames = paste0('chr', str_extract(sub_vcf@fix[,'CHROM'], '[0-9]+')), ranges = IRanges(start = as.numeric(sub_vcf@fix[,'POS']), width = 1))
+  seqlengths(gr) <- hg19_seqlengths[seqinfo(gr)@seqnames]
+  mcols(gr)$density <- 100
+  bins <- IRangesList(lapply(seqlengths(gr),
+                             function(seqlen)
+                               IRanges(breakInChunks(seqlen, 500))))
+  avg_per_bin <- as(bins, "GRanges")
+  seqinfo(avg_per_bin) <- seqinfo(gr)
+  averageMCol <- function(colname){
+    cvg <- coverage(gr, weight=colname)
+    views_list <- RleViewsList(
+      lapply(names(cvg),
+             function(seqname)
+               Views(cvg[[seqname]], bins[[seqname]])))
+    unlist(viewMeans(views_list), use.names=FALSE)
+  }
+  mcols(avg_per_bin) <- DataFrame(lapply(mcols(gr)['density'], averageMCol))
+  norm <- (avg_per_bin$density-min(avg_per_bin$density))/(max(avg_per_bin$density)-min(avg_per_bin$density))
+  scale_size <- norm + 1.2
+  norm <- norm * 99
+  norm <- norm + 1
+  norm <- round(norm)
+  pal <- hil_pal(100)
+  col <- pal[norm]
+  hc = GenomicHilbertCurve(chr = paste0("chr", 1:22), level = 7, arrow = FALSE, background_col = 'black', padding = unit(1, 'mm'), legend = legend)
+  hc_segments(hc, avg_per_bin, gp = gpar(lwd = scale_size, col = col))
+}
+
 
 SarahSeq <- function(){
   appDir <- system.file("app", package = "SarahSeq")

@@ -17,6 +17,7 @@ library(ggplot2)
 library(cowplot)
 library(data.table)
 library(SarahSeq)
+library(HilbertCurve)
 
 # Define server 
 options(shiny.maxRequestSize=500*1024^2)
@@ -34,7 +35,7 @@ shinyServer(function(input, output) {
     # print how many variants in vcf
     output$success <- renderText({
         n_vars <- nrow(vcfInput())
-        print(paste("File with", n_vars, "variants successfully processed!"))
+        print(paste("File with", prettyNum(n_vars, big.mark = ','), "variants successfully processed!"))
         }) 
     
     # define gene of interest when action button is pressed
@@ -148,6 +149,27 @@ shinyServer(function(input, output) {
     # print rare_var_plot
     output$rare_var_plot <- renderPlot({
       print_rare_vars(overlap_df(), as.numeric(input$p_threshold), pal =  pals[[as.numeric(input$pal)]])
+      })
+    
+    
+    # print hilbert curve
+    output$HilbertCurve <- renderPlot({
+      req(input$hilbert_go)
+      p <- ggplot(data.frame(x = seq(1:100)), aes(x = x, y=1, col = x)) +
+            geom_point() +
+            scale_colour_gradientn(colours = hil_pals[[as.numeric(input$hil_pal)]](100), name = 'Density of \nvariants')
+      legd <- get_legend(p)
+      hilbert_plot(vcf = vcfInput(), hil_pal = hil_pals[[as.numeric(input$hil_pal)]], legend = legd)
+      })
+    
+    
+    # download hilbert curve
+    output$download_hil = downloadHandler(
+      filename = 'hilbert_curve.png',
+      content = function(file) {
+        png(file, bg = 'black')
+        hilbert_plot(vcf = vcfInput(), hil_pal = hil_pals[[as.numeric(input$hil_pal)]])
+        dev.off()
       })
 })
 

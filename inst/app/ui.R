@@ -81,6 +81,19 @@ shinyUI(fluidPage(
                              tags$hr(),
                              h6('For detailed information about what each population code stands for, see', 
                                 tags$a(href="https://www.internationalgenome.org/faq/which-populations-are-part-your-study/", "this website.")))
+                ),
+                tabPanel("Visualisation",
+                         tags$div(style="margin-top:40px; margin-bottom:30px;",
+                                  h5('View your genome as a Hilbert curve coloured by the density of variants in a given region.'),
+                                  actionButton('hilbert_go', label = 'GO')),
+                         tags$hr(),
+                         radioButtons('hil_pal', '', inline = T, choiceValues = 1:2, selected = 1, 
+                                      choiceNames = paste('Palette', 1:2)),
+                         withSpinner(plotOutput('HilbertCurve'), color = "#4b36c7"),
+                         #plotOutput('hilbert_legd', height = "30px"),
+                         downloadButton('download_hil', 'Download Plot'),
+                         tags$br(),
+                         tags$br()
                 )
             )
         ))
